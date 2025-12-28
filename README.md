@@ -1,89 +1,118 @@
 # 🚴 Cyclistic Bike-Share (Chicago) — Behavioral Analytics & Data Strategy
 
-![Records](https://img.shields.io/badge/Records-28M-blue) ![Period](https://img.shields.io/badge/Period-2021--2025-lightgrey) ![SQL](https://img.shields.io/badge/SQL-PostgreSQL-316192?logo=postgresql&logoColor=white) ![R](https://img.shields.io/badge/R-4.5.1-276DC3?logo=r&logoColor=white) ![ML](https://img.shields.io/badge/ML-Logit%20%7C%20RandomForest-orange) ![EDA](https://img.shields.io/badge/EDA-Exploratory%20Analysis-green) ![Weather](https://img.shields.io/badge/Data-Meteostat-blueviolet)![Power BI](https://img.shields.io/badge/PowerBI-Dashboard-F2C811?logo=powerbi&logoColor=white)
+![Records](https://img.shields.io/badge/Records-28M-blue)
+![Period](https://img.shields.io/badge/Period-2021--2025-lightgrey)
+![SQL](https://img.shields.io/badge/SQL-PostgreSQL-316192?logo=postgresql&logoColor=white)
+![R](https://img.shields.io/badge/R-4.5.1-276DC3?logo=r&logoColor=white)
+![ML](https://img.shields.io/badge/ML-Logit%20%7C%20RandomForest-orange)
+![EDA](https://img.shields.io/badge/EDA-Exploratory%20Analysis-green)
+![Weather](https://img.shields.io/badge/Data-Meteostat-blueviolet)
+![PowerBI](https://img.shields.io/badge/PowerBI-Dashboard-F2C811?logo=powerbi&logoColor=white)
 
-***Dataset finale**:* \~21M corse · ***Periodo**:* 2021–2025 · ***Stack**:* PostgreSQL · R · SQL · ML\
-***Repository**:* End-to-end data project con pipeline, EDA, modellazione e raccomandazioni
+**Final dataset:** ~21M rides (cleaned) · **Period:** 2021–2025 · **Stack:** PostgreSQL · R · SQL · Power BI · ML  
+**Repository:** End-to-end project with scalable pipeline, EDA, modeling checks, and actionable recommendations.
 
-## Obiettivo del Progetto
+---
 
-Analizzare 58 mesi di dati del servizio Cyclistic per:
+## Project Goal
 
-1.  Identificare pattern d’uso dei segmenti Member vs Casual,
+Analyze 58 months of Cyclistic ride data to:
 
-2.  Costruire una pipeline scalabile su dataset di grandi dimensioni,
+1. Identify usage patterns for **Members vs Casual** riders  
+2. Build a **scalable pipeline** for large datasets  
+3. Integrate **multi-year weather data** (Meteostat)  
+4. Validate behavioral signals using **predictive modeling** (as a supporting check)  
+5. Translate insights into **operational and conversion actions**
 
-3.  Integrare dati meteo multi-anno,
+---
 
-4.  Validare i driver comportamentali via modelli predittivi,
+## Project Architecture
 
-5.  Proporre raccomandazioni operative basate sui dati.
+### 1) Data Engineering
+- Automated CSV ingestion
+- Cleaning, deduplication, and feature engineering in SQL
+- Meteostat integration  
+→ see [pipeline_details.md](Cyclistic-Bike-Share-Analytics/pipeline_details.md)
 
-## Architettura del Progetto
 
-1.  *Data Engineering*
-    -   ingestione automatizzata dei CSV
-    -   pulizia, deduplicazione e feature engineering in SQL
-    -   integrazione dati Meteostat\
-        → vedi [pipeline_details.md](pipeline_details.md)
-2.  *EDA (Exploratory Data Analysis)*
-    -   comportamento Member vs Casual
-    -   pattern temporali, geografici, meteo\
-        → vedi [EDA.md](EDA.md)
-3.  *Modelli Predittivi*
-    -   Logistic Regression + Random Forest
-    -   AUC \~0.74, accuracy \~70%\
-        → vedi [ML_models.md](ML_models.md)
-4.  *Strategic Insights*
-    -   conversione selettiva dei Casual
-    -   consolidamento commuting
-    -   ottimizzazione stagionale della flotta\
-        → vedi [Strategic_Recommendations.md](Strategic_Recommendations.md)
+### 2) EDA (Exploratory Analysis)
+- Member vs Casual behavioral differences
+- Temporal, geographic, and weather-driven patterns  
+→ see [EDA.md](Cyclistic-Bike-Share-Analytics/EDA.md)
 
-## Risultati Chiave
+### 3) Predictive Modeling (validation layer)
+- Logistic Regression + Random Forest
+- Performance indicative on this dataset (AUC ~0.74; accuracy ~70%)  
+→ see [ML_models.md](Cyclistic-Bike-Share-Analytics/ML_models.md)
 
--   *Durata* = principale driver comportamentale
--   *Stazioni* = commuter hub vs hotspot turistici
--   *Tempo* = feriali/mattina → Member; weekend/estate → Casual
--   *Meteo* = condizioni miti (15–25°C) amplificano uso ricreativo
--   I modelli confermano statisticamente i pattern (AUC \~0.74)
+### 4) Strategic Insights & Recommendations
+- Selective conversion of high-intent Casual riders
+- Member retention / commuting reinforcement
+- Seasonal fleet planning and rebalancing  
+→ see [Strategic_Recommendations.md](Cyclistic-Bike-Share-Analytics/Strategic_Recommendations.md)
 
-## Dashboard (Power BI)
+---
 
-La dashboard di Cyclistic fornisce un'analisi comportamentale completa, traducendo oltre 21 milioni di corse in un piano d'azione strategico per massimizzare la fidelizzazione e la crescita degli abbonati. Il report è suddiviso in tre sezioni (**Executive Overview, Context & Predictive Insights, Strategy & Actions**) per garantire un flusso narrativo coerente e orientato alla decisione. ![](PowerBI/dashboard_page1.png)
+## Key Findings (Executive Summary)
 
-### Key Features & Techniques Used
+- **Ride duration** is the strongest behavioral differentiator (Casual rides skew longer)
+- **Stations** split into commuting hubs vs tourist/leisure hotspots
+- **Time patterns:** weekdays/mornings skew Member; weekends/summer skew Casual
+- **Weather sensitivity:** mild temperatures (15–25°C) amplify leisure demand
+- Models support these patterns as predictive signals (not causal proof)
 
--   *Analisi Comportamentale (EDA):* Delinea i pattern opposti di Member (61%) vs Casual (39%), identificando la *durata della corsa* come principale driver di differenziazione.
--   *Integrazione Meteo & Stagionalità:* Valuta la *resilienza dei Member* alle condizioni avverse e quantifica la dipendenza dei Casual dalle condizioni climatiche e dalla stagione (indice di stagionalità ≈ 5:1 tra estate e inverno).
--   *Driver Predittivi (ML):* Utilizza l'output di modelli di Regressione Logistica e Random Forest per identificare e quantificare i fattori più influenti tramite *feature importance* e *odds ratio*.
--   *Mappa Strategica Spazio/Tempo:* Analizza la domanda per fasce orarie (mattina/sera) e categorie di stazioni (commuter/turistica) per mappare l’uso funzionale vs ricreativo.
--   *Piano d’Azione Segmentato:* Le raccomandazioni sono chiaramente divise in Member Strategy (consolidamento) e Casual Strategy (conversione selettiva).
+---
 
-### Value & Impact
+## Power BI Dashboard (Storytelling)
 
-✔ *Validazione statistica:* Le ipotesi dell’EDA sono supportate da odds ratio che quantificano l’effetto di variabili chiave (es. durata e tipo di stazione) sulla probabilità di appartenere a ciascun segmento.\
-✔ *Strategia mirata:* Sostiene iniziative come la promozione delle e-bike e il *push post-corsa* come leve per intercettare i Casual ad alto potenziale di conversione.\
-✔ *Ottimizzazione operativa:* Guida il rebalancing della flotta concentrandosi sugli hub di pendolarismo e sulle campagne stagionali per mitigare il calo invernale.\
-✔ *Visione end-to-end:* Collega comportamento utente, meteo e output dei modelli predittivi in un unico framework decisionale.
+The Power BI report turns ~21M rides into an executive storyline and a conversion playbook.  
+It is organized into three pages: **Executive Overview → Weather & Predictive Insights → Strategy & Actions**.
 
-## Struttura del Repository
+![](PowerBI/dashboard_page1.png)
 
-``` text
+### Dashboard Storyline (what each page answers)
+
+**1) Executive Overview — “What is happening?”**  
+High-level KPIs (total rides, segment mix, average duration), monthly trend, weekday demand split, duration distribution, and top stations.  
+Goal: establish baseline performance and how **Members vs Casual** differ.
+
+**2) Weather & Predictive Insights — “Why is it happening?”**  
+A small set of decision KPIs:
+- **Seasonality Index (Summer/Winter, overall)**
+- **Rain Share**
+- **Peak Context Share (Casual: Summer + Weekend)**  
+Supported by charts on rides by season, rain (dry vs rainy days), and temperature bands.  
+Goal: quantify seasonality and weather sensitivity and isolate the **best conversion window**.
+
+**3) Conversion Playbook — “What should we do next?”**  
+Dual strategy with clear actions and measurable success criteria:
+- **Casual strategy:** hotspot offers (Apr–Sep), post-ride prompts after long rides, weather-triggered weekend promos  
+- **Member strategy:** commuting partnerships, expand e-bike availability in commuting hubs, “winter-safe” retention campaigns  
+Includes a “Top Casual Hotspots (Peak Window: Summer + Weekend)” chart to target campaigns.
+
+#### **Full report (PDF):** [dashboard_cyclistic.pdf](PowerBI/dashboard_cyclistic.pdf)
+---
+
+## Value & Impact (business-oriented)
+
+- **Actionable segmentation:** clear separation of functional commuting vs leisure demand
+- **Targeted conversion:** focuses incentives where intent is highest (Summer + Weekend + hotspots)
+- **Operational planning:** supports fleet allocation and seasonal staffing/rebalancing
+- **End-to-end delivery:** data engineering → analytics → dashboard storytelling → recommendations
+
+---
+
+## Repository Structure
+
+```text
 Cyclistic-Bike-Share-Analytics/
-├── README.md 
-├── pipeline_details.md 
-├── EDA.md 
-├── ML_models.md 
-├── Strategic_Recommendations.md 
-├── sql/ 
+├── README.md
+├── pipeline_details.md
+├── EDA.md
+├── ML_models.md
+├── Strategic_Recommendations.md
+├── sql/
 ├── r/
 ├── PowerBI/
-└── images/                        
+└── images/
 ```
-
-## Riproducibilità
-
--   Database: PostgreSQL
--   Linguaggi: R (tidyverse, dbplyr, data.table) & SQL
--   Pipeline e script disponibili nelle cartelle sql/ e r/

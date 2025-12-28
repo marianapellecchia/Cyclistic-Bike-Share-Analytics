@@ -1,112 +1,134 @@
-# **Modelli di Machine Learning: Validazione dei Pattern Comportamentali**
+# Machine Learning Models — Behavioral Pattern Validation
 
-![Machine Learning](https://img.shields.io/badge/Goal-Model%20Validation-orange?style=for-the-badge) ![Logistic Regression](https://img.shields.io/badge/Model-Logistic%20Regression-blue?style=for-the-badge) ![Random Forest](https://img.shields.io/badge/Model-Random%20Forest-green?style=for-the-badge)
+![Machine Learning](https://img.shields.io/badge/Goal-Model%20Validation-orange?style=for-the-badge)
+![Logistic Regression](https://img.shields.io/badge/Model-Logistic%20Regression-blue?style=for-the-badge)
+![Random Forest](https://img.shields.io/badge/Model-Random%20Forest-green?style=for-the-badge)
 
-Obiettivo: verificare in modo quantitativo se durata, tempo, stazioni e meteo spiegano in modo robusto la differenza tra utenti *Member* e *Casual*.
+**Goal:** quantitatively validate whether **duration**, **time patterns**, **stations**, and **weather** robustly explain the difference between **Member** and **Casual** riders.
 
-## 1. Setup & Dataset
+---
 
-*Dataset:* `trips_with_weather` (campione stratificato da \~21M record)\
-*Target:* `user_type` = Member vs Casual\
-*Train/Test split:* 70/30, stratificato
+## 1) Setup & Dataset
 
-*Feature principali utilizzate:*
+- **Dataset:** `trips_with_weather` (stratified sample from ~21M records)  
+- **Target:** `user_type` = Member vs Casual  
+- **Train/Test split:** 70/30 (stratified)
 
--   *Utilizzo & tempo*
-    -   `duration_min`
-    -   `time_bin` (Notte, Mattina, Pomeriggio, Sera)
-    -   `is_weekend`
-    -   `year`
--   *Tipo bici*
-    -   `bike_type` (classic, electric, other)
--   *Stazioni (senza leakage)*
-    -   `start_station_cat` (tourist, commuter, mixed)
-    -   `end_station_cat` (tourist, commuter, mixed)
--   *Meteo*
-    -   `season` (Inverno, Primavera, Estate, Autunno)
-    -   `temp_bin` (\<5°C, 5–15°C, 15–25°C, ≥25°C)
-    -   `rain`
-    -   `is_snowing`
-    -   `wspd_category` (debole, moderato, forte)
+**Main feature groups**
 
-## 2. Modelli Addestrati
+- **Usage & time**
+  - `duration_min`
+  - `time_bin` (Night, Morning, Afternoon, Evening)
+  - `is_weekend`
+  - `year`
 
-1.  *Logistic Regression*
-    -   baseline interpretabile
-    -   output in odds ratio
-2.  *Random Forest*
-    -   modello non lineare
-    -   capacità di catturare interazioni complesse
-    -   addestrato su sotto-campione stratificato del train (5% per classe), valutato sul test completo
+- **Bike type**
+  - `bike_type` (classic, electric, other)
 
-## 3. Performance (alto livello)
+- **Stations (leakage-aware)**
+  - `start_station_cat` (tourist, commuter, mixed)
+  - `end_station_cat` (tourist, commuter, mixed)
 
-| Metrica              | Logistic Regression | Random Forest |
-|----------------------|---------------------|---------------|
-| Accuracy             | \~0.703             | \~**0.706**   |
-| AUC ROC              | \~0.737             | \~**0.744**   |
-| Sensitivity (Casual) | \~0.41              | \~0.43        |
-| Specificity (Member) | \~0.89              | \~0.88        |
+- **Weather**
+  - `season` (Winter, Spring, Summer, Autumn)
+  - `temp_bin` (<5°C, 5–15°C, 15–25°C, ≥25°C)
+  - `rain`
+  - `is_snowing`
+  - `wspd_category` (light, moderate, strong)
 
--   Entrambi i modelli superano il *No Information Rate* (\~0.61).\
--   La *Random Forest* è leggermente migliore in AUC e accuracy.\
--   Entrambi i modelli sono *più precisi nel riconoscere i Member* (comportamento più regolare).
+---
 
-## 4. Driver Principali (Logistic Regression)
+## 2) Trained Models
 
-I coefficienti sono stati interpretati come *odds ratio* (OR) rispetto alla probabilità di essere *Member*.
+1) **Logistic Regression**
+- interpretable baseline
+- coefficients reported as **odds ratios**
 
-**Durata (duration_min)** - OR \~0.98 per minuto\
-- Ogni +10 minuti di corsa ≈ −20% odds di essere Member\
-➡ Le corse lunghe sono fortemente associate ai Casual.
+2) **Random Forest**
+- non-linear model capturing interactions
+- trained on a stratified train sub-sample (5% per class), evaluated on the full test set
 
-*Tempo & calendario* - time_binMattina / Pomeriggio / Sera → OR \> 1 rispetto alla Notte\
-- is_weekend → OR \< 1\
-➡ Mattina e feriali sono tipici dei Member; weekend sposta il mix verso i Casual.
+---
 
-*Evoluzione temporale* - year → OR \> 1\
-➡ Nel tempo aumenta la quota relativa di Member: il servizio si consolida come mezzo di trasporto regolare.
+## 3) High-level Performance
 
-*Tipo di bici* - bike_typeother → OR ≪ 1\
-- bike_typeelectric → OR \< 1\
-➡ Docked/other quasi solo Casual; e-bike più associata a utilizzi “Casual-friendly”.
+| Metric | Logistic Regression | Random Forest |
+|---|---:|---:|
+| Accuracy | ~0.703 | **~0.706** |
+| ROC AUC | ~0.737 | **~0.744** |
+| Sensitivity (Casual) | ~0.41 | ~0.43 |
+| Specificity (Member) | ~0.89 | ~0.88 |
 
-*Stazioni* - station_cattourist → OR \< 1\
-- tation_catcommuter → OR \> 1\
-➡ Le categorie di stazione sono un forte discriminante tra turismo e commuting.
+- Both models exceed the **No Information Rate** (~0.61).  
+- Random Forest is slightly better in AUC and accuracy.  
+- Both are more accurate at identifying **Members** (more regular patterns) than **Casual** riders (noisier behavior).
 
-*Stagioni & meteo* - Stagioni non invernali → OR \< 1 rispetto all’inverno\
-- Pioggia/neve → OR \> 1\
-➡ In condizioni avverse restano soprattutto utenti Member.
+---
 
-## 5. Feature Importance (Random Forest)
+## 4) Key Drivers (Logistic Regression)
 
-Ordine di importanza (schematizzato):
+Coefficients are interpreted as **odds ratios (OR)** for the probability of being a **Member**.
 
-1.  **`duration_min`**\
-2.  **`end_station_cat`**\
-3.  **`bike_type`**\
-4.  `start_station_cat`
-5.  `is_weekend`
-6.  `temp_bin`
-7.  `time_bin`
-8.  `year, season`
-9.  `rain, wspd_category, is_snowing`
+**Duration (`duration_min`)** — OR ~0.98 per minute  
+- Every +10 minutes ≈ ~20% lower odds of being a Member  
+➡ Longer rides are strongly associated with Casual behavior.
 
-➡ Il modello non lineare conferma la stessa gerarchia osservata in EDA: *durata, stazioni, tempo* dominano il comportamento; il meteo modula il mix utenti.
+**Time & calendar**  
+- Morning / Afternoon / Evening vs Night → OR > 1  
+- `is_weekend` → OR < 1  
+➡ Weekdays and morning peaks align with commuting; weekends shift the mix toward Casual riders.
 
-## 6. Interpretazione & Limiti
+**Temporal evolution (`year`)** — OR > 1  
+➡ Over time, the relative share of Members increases, consistent with the service consolidating as a regular transport option.
 
--   I modelli sono progettati per *validare pattern*, non per deployment in produzione.
--   Sono particolarmente forti nel riconoscere i Member, meno nel distinguere tutti i casi di Casual (comportamento più rumoroso).
--   Per obiettivi orientati alla conversione Casual si potrebbero:
-    -   variare la soglia di classificazione (≠ 0.5),
-    -   usare class weights/cost-sensitive learning,
-    -   costruire un modello dedicato a “Casual ad alto potenziale”.
+**Bike type**  
+- `bike_type = other` → OR ≪ 1  
+- `bike_type = electric` → OR < 1  
+➡ “Docked/other” skews heavily Casual; e-bikes are more associated with leisure-friendly usage.
 
-## 7. Collegamenti
+**Stations**  
+- `station_cat = tourist` → OR < 1  
+- `station_cat = commuter` → OR > 1  
+➡ Station categories strongly differentiate tourism vs commuting contexts.
 
--   EDA: [EDA.md](EDA.md)
--   Pipeline: [pipeline_details.md](pipeline_details.md)
--   Strategia: [Strategic_Recommendations.md](Strategic_Recommendations.md)
--   Script R: r/04_machine_learning_models.R
+**Season & weather**  
+- Non-winter seasons → OR < 1 (vs winter)  
+- Rain/snow → OR > 1  
+➡ Under adverse conditions, the remaining demand tends to skew toward Members.
+
+---
+
+## 5) Feature Importance (Random Forest)
+
+Approximate importance ranking:
+
+1. **`duration_min`**  
+2. **`end_station_cat`**  
+3. **`bike_type`**  
+4. `start_station_cat`  
+5. `is_weekend`  
+6. `temp_bin`  
+7. `time_bin`  
+8. `year`, `season`  
+9. `rain`, `wspd_category`, `is_snowing`
+
+➡ The non-linear model confirms the same hierarchy observed in EDA: **duration, stations, and time** dominate; **weather** modulates the segment mix.
+
+---
+
+## 6) Interpretation & Limitations
+
+- Models are designed for **pattern validation**, not production deployment.
+- Stronger at recognizing Members; less precise on all Casual cases (more heterogeneous behavior).
+- For conversion-oriented objectives (e.g., “high-potential Casual”), next steps could include:
+  - threshold tuning (≠ 0.5)
+  - class weights / cost-sensitive learning
+  - a dedicated model for “high conversion propensity” Casual riders
+
+---
+
+## 7) Links
+- EDA: [EDA.md](EDA.md)  
+- Pipeline: [pipeline_details.md](pipeline_details.md)  
+- Strategy: [Strategic_Recommendations.md](Strategic_Recommendations.md)  
+- R script: `r/04_machine_learning_models.R`

@@ -1,72 +1,71 @@
 # Data Pipeline — SQL + R (2021–2025)
 
-![SQL](https://img.shields.io/badge/SQL-PostgreSQL-316192?logo=postgresql&logoColor=white) ![R](https://img.shields.io/badge/R-4.5.1-276DC3?logo=r&logoColor=white) ![ETL](https://img.shields.io/badge/ETL-%20Pipeline-orange)![Data Cleaning](https://img.shields.io/badge/Data%20Quality-High-green)![Big Data](https://img.shields.io/badge/Data%20Volume-Big%20Data-red)
+![SQL](https://img.shields.io/badge/SQL-PostgreSQL-316192?logo=postgresql&logoColor=white)
+![R](https://img.shields.io/badge/R-4.5.1-276DC3?logo=r&logoColor=white)
+![ETL](https://img.shields.io/badge/ETL-Pipeline-orange)
+![Data Cleaning](https://img.shields.io/badge/Data%20Quality-High-green)
+![Big Data](https://img.shields.io/badge/Data%20Volume-Big%20Data-red)
 
-Documentazione tecnica della pipeline utilizzata per ingestione, pulizia, integrazione meteo e costruzione del dataset analitico finale (`trips_with_weather`).
+Technical documentation of the pipeline used to ingest, clean, enrich with weather data, and build the final analytics dataset (`trips_with_weather`).
 
-## Architettura
+---
 
-Pipeline ibrida R + PostgreSQL progettata per gestire \~28M record:
+## Architecture
 
--   **R (data.table)** → ingestione CSV ad alta velocità
--   *PostgreSQL* → storage, cleaning, feature engineering
--   **R (dbplyr)** → analisi e derivazioni leggere senza scaricare i dati grezzi
--   *Meteostat* → arricchimento meteo multi-anno (temperatura, pioggia, neve, vento)
+Hybrid **R + PostgreSQL** pipeline designed to handle ~28M records:
 
-## Workflow della Pipeline
+- **R (data.table)** → high-speed CSV ingestion
+- **PostgreSQL** → storage, cleaning, feature engineering
+- **R (dbplyr)** → light transformations/analysis without exporting raw data
+- **Meteostat** → multi-year weather enrichment (temperature, rain, snow, wind)
 
-### 1. Ingestione (R → PostgreSQL)
+---
 
--   58 file mensili (2021–2025), \~28M righe totali
--   Import con `fread()` per massima velocità
--   Append nella tabella grezza `trip_raw`
+## Pipeline Workflow
 
-*Script principale:* *r/*01_connect_and_import.R
+### 1) Ingestion (R → PostgreSQL)
+- 58 monthly files (2021–2025), ~28M total rows
+- Import via `fread()` for speed
+- Append into raw table `trip_raw`
 
-``` r
+**Main script:** `r/01_connect_and_import.R`
+
+```r
 dt <- fread(f)
 dbWriteTable(con, "trip_raw", value = dt, append = TRUE)
 ```
+### 2) Cleaning & Feature Engineering (SQL)
 
-### 2. Cleaning & Feature Engineering (SQL)
+Create `trip_prepared`:
 
-Creazione tabella `trip_prepared`:
+1. Compute ride duration (ended_at - started_at)
+2. Extract time attributes (year, month, day, hour)
+3. Weekend flag (Fri–Sun)
+4. Time-of-day bands (Night, Morning, Afternoon, Evening)
 
-1\. Calcolo durata (ended_at - started_at)
-
-2\. Estrazione: anno, mese, giorno, ora
-
-3\. Flag weekend (Ven–Sab–Dom)
-
-4\. Fasce orarie (Mattina, Pomeriggio, Sera, Notte)
-
-*Parte dello script sql/:*
+*Example sql/:*
 
 ``` sql
 CREATE TABLE trip_prepared AS
 SELECT ride_id, rideable_type, started_at, ended_at, start_station_name, start_station_id, end_station_name, end_station_id, member_casual,
 --- ...
 CASE 
-    WHEN EXTRACT (HOUR FROM started_at) BETWEEN 0 AND 5 THEN 'Notte'
-    WHEN EXTRACT (HOUR FROM started_at) BETWEEN 6 AND 11 THEN 'Mattina'
+    WHEN EXTRACT (HOUR FROM started_at) BETWEEN 0 AND 5 THEN 'Night'
+    WHEN EXTRACT (HOUR FROM started_at) BETWEEN 6 AND 11 THEN 'Morning'
 --- ...
 FROM trip_raw WHERE started_at IS NOT NULL 
 AND ended_at IS NOT NULL;
 ```
 
-### 3. Filtraggio Outlier
+### 3) Outlier Filtering
 
-Tabella `trip_filtered`:
+Create `trip_filtered` by removing technically implausible rides:
+1.  Duration < 1 minute → docking/unlocking errors
+2.  Duration > 24 hours → system issues
 
-1.  Durata \<1 min → errori di sgancio
-2.  Durata \>24h → problemi di sistema
+### 4) Deduplication
 
-**→ Rimozione corse tecnicamente impossibili**
-
-### 4. Deduplicazione
-
-**121** **duplicati rimossi** tramite window function:
-
+Remove **121 duplicates** using a window function:
 ``` sql
 CREATE TABLE trips_final AS
 SELECT * FROM (
@@ -76,16 +75,13 @@ SELECT * FROM (
 WHERE rn = 1;
 ```
 
-### 5. Integrazione Meteo (Meteostat)
+### 5) Weather Integration (Meteostat)
 
-Dataset importato e unito a livello giornaliero:
-
--   Variabili: tavg, tmin, tmax, prcp, snow, wspd, pres
-
--   *Feature derivate*: season, temp_category, is_rain
+Import and join daily weather data:
+- Variables: `tavg`, `tmin`, `tmax`, `prcp`, `snow`, `wspd`, `pres`
+- Derived features: `season`, `temp_category`, `is_rain`
 
 Join:
-
 ``` sql
 CREATE TABLE trips_with_weather AS
 SELECT t., w.
@@ -93,15 +89,14 @@ FROM trips_final t
 LEFT JOIN weather_daily w
 ON t.ride_date = w.date;
 ```
+**Missing handling**: 5 values → *median* imputation.
 
-**Missing handling**: 5 valori → imputazione *mediana*.
+## Final Table Stages
 
-## Schema Finale delle Tabelle
-
-| Tabella | Descrizione | Stato |
+| Table | Description | Stage |
 |:-----------------------|:-----------------------|:-----------------------|
-| `trip_raw` | Import grezzo dai CSV | 🔴 Raw |
-| `trip_prepared` | Feature engineering temporale | 🟡 Staging |
-| `trip_filtered` | Filtri durata applicati | 🟡 Staging |
-| `trips_final` | Deduplicata e pulita | 🟢 **Ready for Analysis** |
-| `trips_with_weather` | Arricchita con dati meteo e nuove variabili | ⭐ **Gold Dataset** |
+| `trip_raw` | Raw import from CSV | 🔴 Raw |
+| `trip_prepared` | Time-based feature engineering | 🟡 Staging |
+| `trip_filtered` | Duration filters applied | 🟡 Staging |
+| `trips_final` | Cleaned + deduplicated | 🟢 **Ready for Analysis** |
+| `trips_with_weather` | Weather-enriched dataset + derived features | ⭐ **Gold Dataset** |

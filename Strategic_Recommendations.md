@@ -1,117 +1,129 @@
-# **Strategic Recommendations — Data-Driven Actions**
+# Strategic Recommendations — Data-Driven Actions
 
-![Users Breakdown](https://img.shields.io/badge/Casual%2038.9%25%20%7C%20Member%2061.1%25-blue) ![Primary Driver](https://img.shields.io/badge/Top%20Driver-Durata%20Corsa-purple) ![Peak Conversion](https://img.shields.io/badge/Conversion%20Window-Estate%20%7C%20Weekend-yellow) ![Low Conversion](https://img.shields.io/badge/NO%20Conversion-Freddo%20%7C%20Pioggia-red) ![Geo Insight](https://img.shields.io/badge/Hotspots-Turistici%20vs%20Commuter-orange) ![Resource Strategy](https://img.shields.io/badge/Flotta-Redistribuzione%20Stagionale-green)
+![Users Breakdown](https://img.shields.io/badge/Casual%2038.9%25%20%7C%20Member%2061.1%25-blue)
+![Primary Driver](https://img.shields.io/badge/Top%20Driver-Ride%20Duration-purple)
+![Peak Conversion](https://img.shields.io/badge/Conversion%20Window-Summer%20%7C%20Weekend-yellow)
+![Low Conversion](https://img.shields.io/badge/NO%20Conversion-Cold%20%7C%20Rain-red)
+![Geo Insight](https://img.shields.io/badge/Hotspots-Tourist%20vs%20Commuter-orange)
+![Resource Strategy](https://img.shields.io/badge/Fleet-Seasonal%20Rebalancing-green)
 
-Le analisi (EDA) e i modelli predittivi (Logit + Random Forest) mostrano due segmenti distinti e stabili nel tempo:
+EDA and predictive checks (Logistic Regression + Random Forest) consistently highlight two distinct rider segments:
 
--   *Member (pendolari)* → utilizzo breve, ricorrente, “all-weather”
--   *Casual (turismo/tempo libero)* → utilizzo lungo, stagionale, sensibile al meteo
+- **Members (commuters)** → shorter, recurring, “all-weather” usage  
+- **Casual riders (leisure/tourism)** → longer trips, highly seasonal, weather-sensitive  
 
-I driver principali validati dal ML:
+Key behavioral drivers supported by the models include:
+- **Ride duration** (top feature)
+- **Station category** (tourist vs commuter hubs)
+- **Time patterns** (time-of-day, weekend effect)
+- **Seasonality and weather conditions**
 
--   Durata della corsa (feature #1),
+These findings inform the recommendations below.
 
--   Categoria delle stazioni (tourist vs commuter),
+---
 
--   Tempo (fasce orarie, weekend),
+## 1) Member Strategy (Retention & Commuting)
 
--   Stagionalità e condizioni meteo.
+**Goal:** increase renewals, reinforce commuter usage, and sustain demand in adverse conditions.
 
-Queste evidenze guidano le seguenti raccomandazioni.
+### Actions
 
-## 1. Strategia per i Member (Retention & Commuting)
+- **Strengthen commuting usage**
+  - corporate partnerships  
+  - home–work incentives  
+  - targeted offers for **7–9 AM** and **4–6 PM**  
+  *Rationale:* commuter hubs show stable year-round patterns and strong association with Member behavior.
 
-*Obiettivo:* aumentare rinnovi, fidelizzare utilizzo pendolare, sostenere uso in condizioni avverse.
+- **Winter “all-weather” retention campaigns**
+  - safety kit messaging  
+  - e-bike visibility and comfort positioning  
+  *Rationale:* in poor weather, the remaining demand tends to skew toward Members → realistic messaging supports retention rather than conversion.
 
-### Azioni
+- **Upgrade comfort in business areas**
+  - prioritize e-bike availability  
+  - increase station density in business districts  
+  *Rationale:* e-bikes are often associated with functional rides when stations are not primarily tourist-oriented.
 
--   *Potenziare il commuting*
-    -   partnership con aziende
-    -   incentivi casa-lavoro
-    -   promozioni per fasce 7–9 e 16–18\
-        Razionale: commuting hub = OR \> 1, pattern stabile tutto l’anno
--   *Inverno: campagne “all-weather”*
-    -   kit sicurezza
-    -   visibilità delle e-bike\
-        Razionale: pioggia/neve aumentano odds Member → messaging realistico
--   *Upgrade comfort*
-    -   priorità alle e-bike
-    -   stazioni ad alta densità nelle zone business\
-        Razionale: e-bike più associate all’uso funzionale quando non turistiche
+---
 
-## 2. Strategia per i Casual (Conversione Selettiva)
+## 2) Casual Strategy (Selective Conversion)
 
-*Obiettivo:* convertire solo quando il comportamento Casual assomiglia a quello Member.
+**Goal:** convert only when Casual behavior resembles high-intent, membership-like usage.
 
-### Finestra di conversione ad alta probabilità
+### High-probability conversion window
+- mild season (**15–25°C**)  
+- weekends  
+- tourist hotspots  
+- longer rides  
 
--   stagione mite (15–25°C)
--   weekend
--   hotspot turistici
--   corse lunghe
+### Actions
 
-### Azioni
+- **Targeted offers at tourist hotspots (Apr–Sep)**
+  - “3-day pass → annual membership upgrade”  
+  *Rationale:* tourist stations are strongly associated with Casual usage, making them ideal campaign entry points.
 
--   *Offerte mirate nei punti turistici*
-    -   “3-day pass → upgrade annuale”\
-        Razionale: stazioni turistiche → OR \< 1 (segmento Casual chiaro)
--   *Push post-corsa lunga*
-    -   notifiche di risparmio / bundle upgrade\
-        Razionale: +10 min durata = −20% odds Member → forte segnale ricorrente
--   *Target giovani/lifestyle*
-    -   iniziative gamification, social, micro-incentivi\
-        Razionale: utilizzo concentrato in estate/pomeriggio
+- **Post-long-ride prompts**
+  - in-app/email nudges after long rides (savings message, upgrade bundles)  
+  *Rationale:* longer ride duration is a strong signal of Casual behavior and a practical trigger for conversion prompts.
 
-## 3. Strategia sulla Flotta (Ottimizzazione Operativa)
+- **Lifestyle / younger audience targeting**
+  - gamification, social initiatives, micro-incentives  
+  *Rationale:* usage concentrates in summer and leisure time (often afternoons/weekends), where engagement tactics perform best.
 
-### Azioni
+---
 
--   *Aumentare e-bike*
+## 3) Fleet Strategy (Operational Optimization)
 
-    -   riducono sforzo in caldo/vento moderato\
-        Razionale: bike_type tra le feature top del modello\*
+### Actions
 
--   *Ridurre flotta docked obsolete*\
-    Razionale: OR ≪ 1 → quasi esclusivamente Casual a bassa conversione\*
+- **Increase e-bike availability**
+  - reduces effort under heat and moderate wind  
+  *Rationale:* bike type is among the most relevant model signals and can improve perceived convenience.
 
--   *Redistribuzione stagionale dinamica*
+- **Reduce obsolete docked fleet**
+  *Rationale:* docked bikes are strongly skewed toward low-conversion Casual usage and may deliver lower ROI vs modern bike types.
 
-    -   estate: più mezzi nelle aree turistiche
-    -   inverno: rinforzo nei commuting hub\
-        Razionale: ciclicità stabile Member vs stagionalità Casual\*
+- **Dynamic seasonal rebalancing**
+  - summer: allocate more bikes to tourist areas  
+  - winter: reinforce commuting hubs  
+  *Rationale:* Member demand is more stable while Casual demand is highly seasonal → fleet should follow predictable cycles.
 
-## 4. Dove NON investire (Bassa ROI)
+---
 
-### Contesti da evitare
+## 4) Where NOT to Invest (Low ROI)
 
-| Condizione | Motivo |
-|----|----|
-| *Freddo \<5°C* | domanda Casual \~−80% |
-| *Pioggia/vento forte* | quasi solo Member residui → nessuna conversione |
-| *Caldo \>25°C* | uso frammentato, motivazione non orientata all’abbonamento |
+### Avoid these contexts
 
-➡ Campagne marketing e promozioni in queste condizioni hanno ROI molto basso.
+| Condition | Why |
+|---|---|
+| **Cold < 5°C** | Casual demand drops sharply |
+| **Rain / strong wind** | demand skews heavily toward residual Members → low conversion potential |
+| **Hot > 25°C** | fragmented usage and lower membership intent |
 
-## 5. Sintesi Finale
+➡ Marketing and promotions in these conditions typically generate **low ROI**.
 
-Le analisi mostrano pattern coerenti, stabili e predittivi.\
-Le leve operative con maggiore impatto sono:
+---
 
--   *durata della corsa* (driver #1),
--   *categoria stazione*,
--   *fascia oraria / weekend*,
--   *stagione e meteo*,
--   *tipo di bici*.
+## 5) Final Summary
 
-L’approccio strategico ottimale è duale:
+Across EDA and modeling checks, patterns are coherent and stable. The highest-impact levers are:
+- **ride duration** (top driver)  
+- **station category**  
+- **time-of-day / weekend effect**  
+- **seasonality and weather**  
+- **bike type**
 
-1.  *Consolidare i Member* → commuting, comfort, inverno
-2.  *Convertire i Casual solo nei contesti ad alta propensione* → estate, weekend, hotspot, corse lunghe
+The optimal strategy is dual:
 
-Questo massimizza conversioni e utilizzo della flotta con investimenti mirati.
+1) **Consolidate Members** → commuting, comfort, winter retention  
+2) **Selectively convert Casual riders** only in high-propensity contexts → summer + weekend + hotspots + long rides  
 
-## 🔗 Collegamenti
+This maximizes conversions and fleet utilization through targeted investments.
 
--   Modelli ML: [ML_models.md](ML_models.md)
--   EDA: [EDA.md](EDA.md)
--   Pipeline: [pipeline_details.md](pipeline_details.md)
+---
+
+## 🔗 Links
+
+- ML models: [ML_models.md](ML_models.md)  
+- EDA: [EDA.md](EDA.md)  
+- Pipeline: [pipeline_details.md](pipeline_details.md)

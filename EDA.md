@@ -1,162 +1,160 @@
-# **Analisi Esplorativa Avanzata (EDA)**
+# Advanced Exploratory Data Analysis (EDA)
 
-![R](https://img.shields.io/badge/R-276DC3?style=for-the-badge&logo=r&logoColor=white) ![DBPLYR](https://img.shields.io/badge/DBPLYR-316192?style=for-the-badge&logo=r&logoColor=white) ![Meteostat](https://img.shields.io/badge/Meteostat-Weather-blue?style=for-the-badge)![EDA](https://img.shields.io/badge/Exploratory%20Analysis-Business%20Insights-blue?style=for-the-badge) ![Segmentation](https://img.shields.io/badge/Segmentation-Behavioral%20Dichotomy-red)![Geospatial](https://img.shields.io/badge/Analysis%20Scope-Geospatial%2FLocation-orange)
+![R](https://img.shields.io/badge/R-276DC3?style=for-the-badge&logo=r&logoColor=white)
+![DBPLYR](https://img.shields.io/badge/DBPLYR-316192?style=for-the-badge&logo=r&logoColor=white)
+![Meteostat](https://img.shields.io/badge/Meteostat-Weather-blue?style=for-the-badge)
+![EDA](https://img.shields.io/badge/Exploratory%20Analysis-Business%20Insights-blue?style=for-the-badge)
+![Segmentation](https://img.shields.io/badge/Segmentation-Behavioral%20Dichotomy-red?style=for-the-badge)
+![Geospatial](https://img.shields.io/badge/Analysis%20Scope-Geospatial%2FLocation-orange?style=for-the-badge)
 
-Analisi descrittiva su 20M+ corse per identificare pattern comportamentali utili a modellazione e strategia.\
-Segmenti analizzati: *Member (pendolari)* vs *Casual (turismo/tempo libero)*.
+Descriptive analysis on **20M+ rides** to identify behavioral patterns useful for modeling and business strategy.  
+Segments: **Member (commuters)** vs **Casual (leisure/tourism)**.
 
 Dataset: `trips_with_weather`
 
-## 1. Composizione Utenti
+---
 
-I due segmenti mostrano volumi e stabilità molto diversi.
+## 1) User Mix
 
-| Segmento | \% Mix  | Insight                       |
-|----------|---------|-------------------------------|
-| *Member* | **61%** | Domanda stabile e prevedibile |
-| *Casual* | **39%** | Domanda altamente stagionale  |
+The two segments show very different volume patterns and stability.
+
+| Segment | Mix % | Insight |
+|---|---:|---|
+| **Member** | **61%** | More stable and predictable demand |
+| **Casual** | **39%** | Highly seasonal demand |
 
 ![](images/composizioneutenti.png)
 
-*Pattern chiave:* i Member sostengono l’utilizzo annuale; i Casual generano picchi concentrati.
+**Key pattern:** Members sustain year-round usage; Casual riders drive concentrated peaks.
 
-## 2. Durata della Corsa (Driver Principale)
+---
 
-La durata è la variabile più discriminante.
+## 2) Ride Duration (Primary Driver)
 
-| Segmento | Media          | Mediana  | Interpretazione          |
-|----------|----------------|----------|--------------------------|
-| *Member* | **\~12.7 min** | 9.1 min  | Uso funzionale/commuting |
-| *Casual* | **\~24.9 min** | 14.3 min | Uso ricreativo/turistico |
+Ride duration is the most discriminative variable.
+
+| Segment | Avg. | Median | Interpretation |
+|---|---:|---:|---|
+| **Member** | ~**12.7 min** | 9.1 min | Functional / commuting usage |
+| **Casual** | ~**24.9 min** | 14.3 min | Leisure / tourist usage |
 
 ![](images/duratadellecorse.png)
 
-➡ Le corse lunghe sono un segnale di comportamento “Casual” e saranno driver chiave nei modelli.
+➡ Longer rides are a strong signal of Casual behavior and will be a key driver in downstream modeling.
 
-## 3. Pattern Temporali
+---
 
-### 3.1 Giorni della Settimana
+## 3) Temporal Patterns
 
-| Dimensione    | Member    | Casual       |
-|---------------|-----------|--------------|
-| Picco         | Lun–Gio   | Ven–Dom      |
-| Comportamento | commuting | tempo libero |
+### 3.1 Day of Week
+| Dimension | Member | Casual |
+|---|---|---|
+| Peak days | Mon–Thu | Fri–Sun |
+| Behavior | commuting | leisure |
 
 ![](images/weekendvsweekday.png)
 
-### 3.2 Fasce Orarie
-
--   *7–9 / 16–18* → dominanza Member (pendolarismo)
--   *12–18* → dominanza Casual (tempo libero)
+### 3.2 Time of Day
+- **7–9 / 16–18** → Member dominance (commuting peaks)
+- **12–18** → Casual dominance (leisure window)
 
 ![](images/oredelgiorno.png)
 
 ![](images/fasciaoraria.png)
 
-### 3.3 Stagionalità Annuale
+### 3.3 Annual Seasonality
+- **Members:** moderate winter decline
+- **Casual:** volume concentrated in **Apr–Sep**, peak in **Jul–Aug**
 
--   *Member:* calo moderato in inverno
--   *Casual:* volume concentrato in Apr–Set, picco Lug–Ago
+![](images/stagioni.png)
 
-![](images/stagioni.png) ➡ La stagione è una delle dimensioni più informative per il segmento Casual.
+➡ Seasonality is one of the most informative dimensions for the Casual segment.
 
-## 4. Dimensione Spaziale
+---
 
-### 4.1 Stazioni
+## 4) Spatial Dimension
 
-Distribuzione geografica coerente con i due segmenti:
+### 4.1 Stations
+Geographic distribution is consistent with the two segments:
 
-| Segmento | Localizzazione tipica                      |
-|----------|--------------------------------------------|
-| *Member* | commuting hub, zone business/residenziali  |
-| *Casual* | waterfront, musei, parchi, aree turistiche |
+| Segment | Typical locations |
+|---|---|
+| **Member** | commuting hubs, business/residential areas |
+| **Casual** | waterfront, museums, parks, tourist areas |
 
 ![](images/stazioni.png)
 
-➡ Le stazioni fungono da proxy comportamentale.
+➡ Stations act as a behavioral proxy (commuting vs leisure context).
 
-### 4.2 Tipo di Bici
-
--   *Classic bike:* prevalente in entrambi i segmenti
--   *E-bike:* crescente, più utilizzata dai Casual
--   *Docked/Eletric scooter:* quasi esclusivamente Casual
+### 4.2 Bike Type
+- **Classic bike:** dominant across both segments
+- **E-bike:** increasing, more used by Casual riders
+- **Docked / electric scooter:** mostly Casual
 
 ![](images/bike.png)
 
-## 5. Meteo: Effetti sul Mix Utenti
+---
 
-Il meteo non influisce solo sul volume, ma su chi utilizza il servizio.
+## 5) Weather: Effects on Volume and Segment Mix
 
-### 5.1 Temperatura
+Weather impacts not only overall volume, but also **who** uses the service.
 
-La temperatura è il driver meteorologico più forte e mostra profili comportamentali molto diversi.
+### 5.1 Temperature
+Temperature is the strongest weather driver and shows distinct behavioral profiles:
 
--   *\<5°C (Freddo)*: crollo dei Casual (\~−80%); i Member restano relativamente più attivi.
-
--   *5–15°C (Fresco)*: fase di transizione; i Member feriali mostrano maggiore resilienza.
-
--   *15–25°C (Mite)*: condizione ideale → baseline di utilizzo massimo per entrambi i segmenti.
-
--   *≥25°C (Caldo)*: riduzione più marcata tra i Member (specialmente nel weekend).
+- **< 5°C (Cold):** sharp drop in Casual demand (~−80%); Members remain relatively more active  
+- **5–15°C (Cool):** transition phase; weekday Members show higher resilience  
+- **15–25°C (Mild):** ideal conditions → highest baseline usage for both segments  
+- **≥ 25°C (Hot):** larger reduction for Members (especially on weekends)
 
 ![](images/sensibilitàtermica.png)
 
-➡ Le temperature estreme amplificano la distanza tra i due segmenti.
+➡ Extreme temperatures widen the gap between the two segments.
 
-### 5.2 Pioggia
+### 5.2 Rain
+Rain reduces volume for both segments, but tends to leave a higher share of functional riders.
 
-La pioggia riduce il volume per tutti, ma seleziona maggiormente utenti con esigenze funzionali.
-
--   *Casual*: −67%
-
--   *Member*: −63%
+- **Casual:** −67%  
+- **Member:** −63%
 
 ![](images/pioggia.png)
 
-➡ I Member mantengono un volume relativamente più alto → utilizzo “necessario” (commuting), non ricreativo.
+➡ Members keep relatively higher usage → closer to “necessary” commuting behavior rather than leisure.
 
-### 5.3 Neve
-
-La neve è un evento di paralisi, non un filtro comportamentale.
-
--   Quasi azzera l’utilizzo in entrambi i segmenti.
-
--   Il servizio diventa poco praticabile anche per i pendolari (*Member*).
+### 5.3 Snow
+Snow is a system-wide constraint rather than a behavioral filter:
+- usage drops close to zero for both segments
+- service becomes less practical even for commuters
 
 ![](images/neve.png)
 
-➡ La neve è un boundary condition: non distinguere i segmenti, li spegne entrambi.
+➡ Snow is a boundary condition: it suppresses demand across the board.
 
-### 5.4 Vento
+### 5.4 Wind
+Wind has a material impact, especially at moderate levels (20–40 km/h):
 
-Il vento ha un impatto significativo, soprattutto nella fascia moderata (20–40 km/h).
-
--   *Vento debole (\<20 km/h)*: baseline;
-
--   *Vento moderato (20–40 km/h)*: forte riduzione per entrambi
-
-    1.  Casual: −82.7%
-    2.  Member: −78.9%
-
--   *Vento Forte (≥40 km/h)*: quasi assenza di corse → condizioni proibitive o limiti nel dato giornaliero.
+- **Light wind (< 20 km/h):** baseline  
+- **Moderate wind (20–40 km/h):** strong reduction for both  
+  1) Casual: −82.7%  
+  2) Member: −78.9%  
+- **Strong wind (≥ 40 km/h):** near-zero rides (prohibitive conditions)
 
 ![](images/vento.png)
 
-➡ Il vento agisce come barriera fisica, non comportamentale: riduce la domanda allo stesso modo nei due segmenti.
+➡ Wind behaves as a physical barrier more than a segment differentiator.
 
-## Output Operativi dell’EDA
+---
 
-L’EDA fornisce insight chiave per passare alla fase predittiva:
+## Operational Outputs from EDA
 
--   Identifica feature realmente informative (no ridondanze, no leakage);
+This EDA supports the predictive and strategy phase by:
+- identifying truly informative features (reducing redundancy and leakage risk)
+- showing that Member/Casual patterns are structured and stable over time
+- highlighting behaviors that remain consistent across years
+- providing a coherent basis for business recommendations and conversion strategy
 
--   Dimostra che i pattern Member/Casual sono strutturati e non casuali;
+---
 
--   Evidenzia comportamenti stabili nel tempo e robusti alla variazione annuale;
-
--   Crea una base coerente per raccomandazioni business e strategia di conversione.
-
-## Collegamenti
-
--   Pipeline: [pipeline_details.md](pipeline_details.md)
--   Modelli ML: [ML_models.md](ML_models.md)
+## Links
+- Pipeline: [pipeline_details.md](pipeline_details.md)  
+- ML models: [ML_models.md](ML_models.md)
